@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credentials — Ryan Drachenberg</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --void: #0A0E14;
+    --panel: #10151C;
+    --panel-raised: #141B24;
+    --hairline: #212A36;
+    --text-primary: #E6EDF3;
+    --text-muted: #7B8794;
+    --text-dim: #4B5563;
+    --signal: #5EEAD4;
+    --signal-dim: #2D5F58;
+    --danger: #E5787C;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(94,234,212,0.06), transparent 60%),
+      var(--void);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding: 40px 16px;
+  }
+
+  .stage{ width:100%; max-width: 760px; }
+
+  .window{
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.7);
+  }
+
+  .titlebar{
+    display:flex; align-items:center; gap: 8px;
+    padding: 12px 16px;
+    background: var(--panel-raised);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .dot{ width:10px; height:10px; border-radius:50%; background: #2B333F; }
+  .titlebar-label{
+    margin-left: 8px; font-family: var(--mono); font-size: 12px;
+    color: var(--text-dim); letter-spacing: 0.02em;
+  }
+
+  .term{ padding: 28px 28px 30px; font-family: var(--mono); font-size: 13.5px; line-height: 1.75; }
+
+  .line{ white-space: pre-wrap; word-break: break-word; opacity:0; }
+  .line.shown{ opacity:1; }
+  .muted{ color: var(--text-muted); }
+  .ok{ color: var(--signal); }
+  .ok::before{ content: "✓ "; }
+  .idx{ color: var(--text-dim); }
+
+  .cursor{
+    display:inline-block; width: 7px; height: 14px; background: var(--signal);
+    margin-left: 2px; vertical-align: -2px; animation: blink 1s step-end infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .summary{
+    margin: 6px 0 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px dashed var(--hairline);
+    border-bottom: 1px dashed var(--hairline);
+    padding: 10px 0;
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .summary.shown{ opacity:1; }
+  .summary b{ color: var(--text-primary); font-weight:600; }
+
+  .certs{ display:flex; flex-direction:column; gap:14px; margin: 4px 0 20px; }
+
+  .cert{
+    border: 1px solid var(--hairline);
+    border-top: 3px solid var(--accent, var(--signal));
+    border-radius: 8px;
+    background: var(--void);
+    padding: 20px 22px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    position: relative;
+  }
+  .cert.shown{ opacity:1; transform: translateY(0); }
+
+  .cert-eyebrow{
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
+    color: var(--text-dim); text-transform: uppercase;
+  }
+  .cert-course{
+    font-family: var(--sans); font-weight: 600; font-size: 18px;
+    color: var(--text-primary); margin: 6px 0 14px; padding-right: 24px;
+  }
+
+  .meta-grid{
+    display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 16px;
+    border-top: 1px dashed var(--hairline); padding-top: 14px;
+  }
+  .meta-key{ font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.07em; }
+  .meta-val{ font-family: var(--mono); font-size: 12.5px; color: var(--text-primary); margin-top: 3px; word-break: break-all; }
+  .meta-val.pending{ color: var(--text-dim); font-style: italic; }
+
+  .cert-link{
+    display:inline-flex; align-items:center; gap:6px; margin-top:14px;
+    font-family: var(--mono); font-size: 12px; color: var(--accent, var(--signal));
+    text-decoration:none; border-bottom: 1px solid transparent;
+  }
+  .cert-link:hover{ border-bottom-color: currentColor; }
+  .cert-link:focus-visible{ outline: 2px solid var(--signal); outline-offset: 3px; }
+
+  .cert-remove{
+    position:absolute; top:14px; right:14px;
+    background:none; border:none; color: var(--text-dim);
+    font-family: var(--mono); font-size: 15px; cursor:pointer; line-height:1;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .cert-remove:hover{ color: var(--danger); background: rgba(229,120,124,0.08); }
+  .cert-remove:focus-visible{ outline: 2px solid var(--signal); outline-offset: 1px; }
+
+  .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 8px; align-items:center; }
+  .btn{
+    font-family: var(--mono); font-size: 12.5px; padding: 10px 16px; border-radius: 6px;
+    border: 1px solid var(--hairline); background: var(--panel-raised); color: var(--text-primary);
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    transition: border-color 0.15s ease, transform 0.1s ease;
+  }
+  .btn:hover{ border-color: var(--signal-dim); }
+  .btn:active{ transform: translateY(1px); }
+  .btn:focus-visible{ outline: 2px solid var(--signal); outline-offset: 2px; }
+  .btn.primary{ background: var(--signal); color: #06211D; border-color: var(--signal); font-weight: 600; }
+  .btn.primary:hover{ filter: brightness(1.05); }
+
+  .status{ font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+  .status.ok{ color: var(--signal); }
+
+  .add-panel{
+    margin-top: 22px;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    background: var(--panel-raised);
+    padding: 18px 20px;
+  }
+  .add-panel summary{
+    cursor:pointer; font-family: var(--mono); font-size: 12.5px;
+    color: var(--text-muted); list-style: none; display:flex; align-items:center; gap:8px;
+    user-select: none;
+  }
+  .add-panel summary::-webkit-details-marker{ display:none; }
+  .add-panel summary::before{ content:"+"; color: var(--signal); font-weight:700; }
+  .add-panel[open] summary::before{ content:"–"; }
+  .add-panel summary:focus-visible{ outline: 2px solid var(--signal); outline-offset: 3px; }
+
+  .add-form{ margin-top: 16px; display:grid; gap: 12px; }
+  .field{ display:flex; flex-direction:column; gap: 6px; }
+  .field label{ font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); text-transform:uppercase; letter-spacing: 0.06em; }
+  .field input[type="text"], .field input[type="url"]{
+    font-family: var(--mono); font-size: 13px; color: var(--text-primary);
+    background: var(--void); border: 1px solid var(--hairline); border-radius: 6px;
+    padding: 9px 10px;
+  }
+  .field input:focus-visible{ outline: 2px solid var(--signal); outline-offset: 1px; }
+  .field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .accent-row{ display:flex; align-items:center; gap: 10px; }
+  .accent-row input[type="color"]{
+    width: 36px; height: 32px; border: 1px solid var(--hairline); border-radius: 6px;
+    background: var(--void); padding: 2px; cursor:pointer;
+  }
+
+  .footline{ margin-top: 20px; font-size: 11.5px; color: var(--text-dim); font-family: var(--mono); }
+
+  @media (max-width: 480px){
+    .meta-grid{ grid-template-columns: 1fr 1fr; }
+    .field-row{ grid-template-columns: 1fr; }
+    .term{ padding: 20px 16px 24px; font-size: 12.5px; }
+    .cert-course{ font-size: 16px; }
+    .summary{ flex-direction:column; gap:4px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor{ animation: none; }
+    .cert, .summary{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="window">
+    <div class="titlebar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="titlebar-label">credentials.log — verify-credential --all</span>
+    </div>
+    <div class="term" id="term">
+      <div class="line" data-key="cmd">$ verify-credential --user ryan.drachenberg --all</div>
+      <div class="line"><span class="muted">Fetching credentials from skilljar.com…</span></div>
+      <div class="line" id="countLine"><span class="muted">6 credentials found. Verifying signatures…</span></div>
+      <div id="verifyLines"><!-- injected --></div>
+      <div class="line"><span class="muted">Rendering certificates…</span></div>
+
+      <div class="summary" id="summary">
+        <span>Holder: <b>Ryan Drachenberg</b></span>
+        <span>Issuer: <b>Anthropic</b></span>
+        <span>Credentials: <b id="countBadge">6</b></span>
+      </div>
+
+      <div class="certs" id="certs"><!-- injected --></div>
+
+      <div class="line" id="doneLine"><span class="muted">Done.</span><span class="cursor" id="cursor"></span></div>
+
+      <div class="actions" id="actions" style="opacity:0; transition: opacity 0.4s ease;">
+        <button class="btn primary" id="saveFileBtn" type="button">Save credentials file</button>
+        <button class="btn" id="printBtn" type="button">Print / Save as PDF</button>
+        <span class="status" id="saveStatus"></span>
+      </div>
+
+      <details class="add-panel">
+        <summary>Add a credential</summary>
+        <form class="add-form" id="addForm">
+          <div class="field">
+            <label for="f-course">Course name</label>
+            <input type="text" id="f-course" required placeholder="e.g. Claude with the Anthropic API">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="f-id">Verification ID <span style="opacity:.6">(optional)</span></label>
+              <input type="text" id="f-id" placeholder="e.g. vz9mhax7e7vz">
+            </div>
+            <div class="field">
+              <label for="f-url">Verification URL <span style="opacity:.6">(optional)</span></label>
+              <input type="url" id="f-url" placeholder="https://verify.skilljar.com/c/…">
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-accent">Accent color</label>
+            <div class="accent-row">
+              <input type="color" id="f-accent" value="#5EEAD4">
+              <span class="status">shows as the card's top border + status color</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn primary">Add to list</button>
+          </div>
+        </form>
+      </details>
+
+      <div class="footline">Issued to ryan.drachenberg@forthepeople.com · forthepeople.com</div>
+    </div>
+  </div>
+</div>
+
+<script id="certsData">
+window.CERTS = [
+  { course:"Claude Code in Action", id:"vz9mhax7e7vz", accent:"#7C8F63",
+    url:"https://verify.skilljar.com/c/vz9mhax7e7vz" },
+  { course:"Introduction to Agent Skills", id:"79vqscxi2prn", accent:"#6F97C4",
+    url:"https://verify.skilljar.com/c/79vqscxi2prn" },
+  { course:"Introduction to Subagents", id:"yy9fbkggn33m", accent:"#9CBBAE",
+    url:"https://verify.skilljar.com/c/yy9fbkggn33m" },
+  { course:"Model Context Protocol: Advanced Topics", id:"zg9rjgra6nrm", accent:"#B3B2CE",
+    url:"https://verify.skilljar.com/c/zg9rjgra6nrm" },
+  { course:"AI Fluency: Framework & Foundations", id:"ekg4iprkokye", accent:"#83925F",
+    url:"https://verify.skilljar.com/c/ekg4iprkokye" },
+  { course:"Claude with the Anthropic API", id:"eqojmqzqzfuz", accent:"#6A8FBF",
+    url:"https://verify.skilljar.com/c/eqojmqzqzfuz" }
+];
+</script>
+
+<script>
+(function(){
+  const term = document.getElementById('term');
+  const verifyLines = document.getElementById('verifyLines');
+  const certsRoot = document.getElementById('certs');
+  const summary = document.getElementById('summary');
+  const countLine = document.getElementById('countLine');
+  const countBadge = document.getElementById('countBadge');
+  const actions = document.getElementById('actions');
+  const cursor = document.getElementById('cursor');
+  const saveStatus = document.getElementById('saveStatus');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function buildVerifyLine(c, i, total){
+    const div = document.createElement('div');
+    div.className = 'line verify-line';
+    div.innerHTML = `<span class="idx">[${i+1}/${total}]</span> <span class="ok">${escapeHtml(c.course)} — valid</span>`;
+    return div;
+  }
+
+  function buildCertCard(c, animate){
+    const el = document.createElement('div');
+    el.className = 'cert' + (animate ? '' : ' shown');
+    el.style.setProperty('--accent', c.accent);
+    const idRow = c.id
+      ? `<div><div class="meta-key">Verification ID</div><div class="meta-val">${escapeHtml(c.id)}</div></div>`
+      : `<div><div class="meta-key">Verification ID</div><div class="meta-val pending">—</div></div>`;
+    const linkRow = c.url
+      ? `<a class="cert-link" style="--accent:${c.accent}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer">View verification →</a>`
+      : `<div class="cert-link" style="--accent:${c.accent}; opacity:.6; cursor:default;">Verification link pending</div>`;
+    el.innerHTML = `
+      <button class="cert-remove" type="button" title="Remove" aria-label="Remove ${escapeHtml(c.course)}">×</button>
+      <div class="cert-eyebrow">Certificate of Completion</div>
+      <div class="cert-course">${escapeHtml(c.course)}</div>
+      <div class="meta-grid">
+        <div><div class="meta-key">Issuer</div><div class="meta-val">Anthropic</div></div>
+        ${idRow}
+        <div><div class="meta-key">Status</div><div class="meta-val" style="color:${c.accent}">Verified ✓</div></div>
+      </div>
+      ${linkRow}
+    `;
+    el.querySelector('.cert-remove').addEventListener('click', () => {
+      const idx = window.CERTS.indexOf(c);
+      if(idx > -1) window.CERTS.splice(idx, 1);
+      el.remove();
+      countBadge.textContent = window.CERTS.length;
+      syncDataScript();
+    });
+    return el;
+  }
+
+  function renderAll(animate){
+    verifyLines.innerHTML = '';
+    certsRoot.innerHTML = '';
+    countBadge.textContent = window.CERTS.length;
+    countLine.querySelector('span').textContent = `${window.CERTS.length} credentials found. Verifying signatures…`;
+    window.CERTS.forEach((c,i) => verifyLines.appendChild(buildVerifyLine(c, i, window.CERTS.length)));
+    window.CERTS.forEach(c => certsRoot.appendChild(buildCertCard(c, animate)));
+  }
+
+  function playIntro(){
+    const staticLines = Array.from(term.querySelectorAll(':scope > .line'));
+    const verifyEls = Array.from(verifyLines.querySelectorAll('.line'));
+    const certEls = Array.from(certsRoot.querySelectorAll('.cert'));
+    const order = [staticLines[0], staticLines[1], staticLines[2], ...verifyEls, staticLines[3], staticLines[4]];
+
+    function step(i){
+      if(i >= order.length){
+        summary.classList.add('shown');
+        revealCerts(0, certEls);
+        return;
+      }
+      if(order[i]) order[i].classList.add('shown');
+      setTimeout(()=>step(i+1), reduce ? 0 : 150);
+    }
+    function revealCerts(i, els){
+      if(i >= els.length){ actions.style.opacity = '1'; return; }
+      els[i].classList.add('shown');
+      setTimeout(()=>revealCerts(i+1, els), reduce ? 0 : 160);
+    }
+    step(0);
+  }
+
+  function showInstant(){
+    term.querySelectorAll('.line').forEach(l => l.classList.add('shown'));
+    summary.classList.add('shown');
+    actions.style.opacity = '1';
+  }
+
+  renderAll(!reduce);
+  if(reduce){ showInstant(); } else { playIntro(); }
+
+  // ---- Add credential form ----
+  document.getElementById('addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const course = document.getElementById('f-course').value.trim();
+    if(!course) return;
+    const id = document.getElementById('f-id').value.trim() || null;
+    const url = document.getElementById('f-url').value.trim() || null;
+    const accent = document.getElementById('f-accent').value || '#5EEAD4';
+    const newCert = { course, id, accent, url };
+    window.CERTS.push(newCert);
+
+    const total = window.CERTS.length;
+    verifyLines.appendChild(buildVerifyLine(newCert, total-1, total));
+    verifyLines.querySelectorAll('.verify-line').forEach((el, i) => el.classList.add('shown'));
+    countLine.querySelector('span').textContent = `${total} credentials found. Verifying signatures…`;
+    countBadge.textContent = total;
+
+    const card = buildCertCard(newCert, false);
+    certsRoot.appendChild(card);
+    card.classList.add('shown');
+
+    e.target.reset();
+    document.getElementById('f-accent').value = '#5EEAD4';
+    syncDataScript();
+    saveStatus.textContent = 'Added — remember to save the file.';
+    saveStatus.classList.remove('ok');
+  });
+
+  // ---- Keep the embedded <script id="certsData"> in sync with window.CERTS ----
+  function syncDataScript(){
+    const dataScript = document.getElementById('certsData');
+    const lines = window.CERTS.map(c => {
+      const id = c.id ? `"${c.id.replace(/"/g,'\\"')}"` : 'null';
+      const url = c.url ? `"${c.url.replace(/"/g,'\\"')}"` : 'null';
+      const course = c.course.replace(/"/g,'\\"');
+      return `  { course:"${course}", id:${id}, accent:"${c.accent}",\n    url:${url} }`;
+    });
+    dataScript.textContent = `\nwindow.CERTS = [\n${lines.join(',\n')}\n];\n`;
+  }
+
+  // ---- Save the whole page back to a file ----
+  let fileHandle = null;
+  async function saveToFile(){
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#saveStatus').textContent = '';
+    const htmlStr = '<!DOCTYPE html>\n' + clone.outerHTML;
+
+    if('showSaveFilePicker' in window){
+      try{
+        if(!fileHandle){
+          fileHandle = await window.showSaveFilePicker({
+            suggestedName: 'certificate.html',
+            types: [{ description: 'HTML file', accept: { 'text/html': ['.html'] } }]
+          });
+        }
+        const writable = await fileHandle.createWritable();
+        await writable.write(htmlStr);
+        await writable.close();
+        saveStatus.textContent = 'Saved to file ✓';
+        saveStatus.classList.add('ok');
+      }catch(err){
+        if(err.name !== 'AbortError'){
+          fallbackDownload(htmlStr);
+        }
+      }
+    } else {
+      fallbackDownload(htmlStr);
+    }
+  }
+  function fallbackDownload(htmlStr){
+    const blob = new Blob([htmlStr], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'certificate.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+    saveStatus.textContent = 'Downloaded — replace your old file with this one.';
+    saveStatus.classList.add('ok');
+  }
+
+  document.getElementById('saveFileBtn').addEventListener('click', saveToFile);
+  document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+})();
+</script>
+
+</body>
+</html>
