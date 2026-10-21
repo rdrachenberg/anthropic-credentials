@@ -1,6 +1,6 @@
 # Credentials
 
-A terminal-styled page verifying Anthropic course completions, with an in-browser form to add new credentials.
+A terminal-styled page verifying Anthropic course completions.
 
 ## Deploy
 
@@ -8,12 +8,13 @@ Connected to Vercel — pushes to `main` deploy automatically.
 
 ## Updating
 
-1. Open `index.html` locally in a browser.
-2. Use the "Add a credential" panel to add a new entry.
-3. Click "Save credentials file" to overwrite your local `index.html`.
-4. Commit and push:
+The site is static, so credentials are hard-coded. To add one:
+
+1. Append an entry to the `window.CERTS` array in the `<script id="certsData">` block of `index.html`
+   (or run `/add-cred <course name> <skilljar id>` in Claude Code).
+2. Commit and push:
    ```
    git add index.html
-   git commit -m "Add credential"
+   git commit -m "Add <course> credential"
    git push
    ```

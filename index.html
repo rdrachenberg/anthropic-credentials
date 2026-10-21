@@ -133,15 +133,6 @@
   .cert-link:hover{ border-bottom-color: currentColor; }
   .cert-link:focus-visible{ outline: 2px solid var(--signal); outline-offset: 3px; }
 
-  .cert-remove{
-    position:absolute; top:14px; right:14px;
-    background:none; border:none; color: var(--text-dim);
-    font-family: var(--mono); font-size: 15px; cursor:pointer; line-height:1;
-    padding: 2px 6px; border-radius: 4px;
-  }
-  .cert-remove:hover{ color: var(--danger); background: rgba(229,120,124,0.08); }
-  .cert-remove:focus-visible{ outline: 2px solid var(--signal); outline-offset: 1px; }
-
   .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 8px; align-items:center; }
   .btn{
     font-family: var(--mono); font-size: 12.5px; padding: 10px 16px; border-radius: 6px;
@@ -155,47 +146,10 @@
   .btn.primary{ background: var(--signal); color: #06211D; border-color: var(--signal); font-weight: 600; }
   .btn.primary:hover{ filter: brightness(1.05); }
 
-  .status{ font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
-  .status.ok{ color: var(--signal); }
-
-  .add-panel{
-    margin-top: 22px;
-    border: 1px solid var(--hairline);
-    border-radius: 8px;
-    background: var(--panel-raised);
-    padding: 18px 20px;
-  }
-  .add-panel summary{
-    cursor:pointer; font-family: var(--mono); font-size: 12.5px;
-    color: var(--text-muted); list-style: none; display:flex; align-items:center; gap:8px;
-    user-select: none;
-  }
-  .add-panel summary::-webkit-details-marker{ display:none; }
-  .add-panel summary::before{ content:"+"; color: var(--signal); font-weight:700; }
-  .add-panel[open] summary::before{ content:"–"; }
-  .add-panel summary:focus-visible{ outline: 2px solid var(--signal); outline-offset: 3px; }
-
-  .add-form{ margin-top: 16px; display:grid; gap: 12px; }
-  .field{ display:flex; flex-direction:column; gap: 6px; }
-  .field label{ font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); text-transform:uppercase; letter-spacing: 0.06em; }
-  .field input[type="text"], .field input[type="url"]{
-    font-family: var(--mono); font-size: 13px; color: var(--text-primary);
-    background: var(--void); border: 1px solid var(--hairline); border-radius: 6px;
-    padding: 9px 10px;
-  }
-  .field input:focus-visible{ outline: 2px solid var(--signal); outline-offset: 1px; }
-  .field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .accent-row{ display:flex; align-items:center; gap: 10px; }
-  .accent-row input[type="color"]{
-    width: 36px; height: 32px; border: 1px solid var(--hairline); border-radius: 6px;
-    background: var(--void); padding: 2px; cursor:pointer;
-  }
-
   .footline{ margin-top: 20px; font-size: 11.5px; color: var(--text-dim); font-family: var(--mono); }
 
   @media (max-width: 480px){
     .meta-grid{ grid-template-columns: 1fr 1fr; }
-    .field-row{ grid-template-columns: 1fr; }
     .term{ padding: 20px 16px 24px; font-size: 12.5px; }
     .cert-course{ font-size: 16px; }
     .summary{ flex-direction:column; gap:4px; }
@@ -229,7 +183,6 @@
       </div>
 
       <div class="certs" id="certs"><div class="cert shown" style="--accent: #7C8F63;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove Claude Code in Action">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">Claude Code in Action</div>
       <div class="meta-grid">
@@ -239,7 +192,6 @@
       </div>
       <a class="cert-link" style="--accent:#7C8F63" href="https://verify.skilljar.com/c/vz9mhax7e7vz" target="_blank" rel="noopener noreferrer">View verification →</a>
     </div><div class="cert shown" style="--accent: #6F97C4;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove Introduction to Agent Skills">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">Introduction to Agent Skills</div>
       <div class="meta-grid">
@@ -249,7 +201,6 @@
       </div>
       <a class="cert-link" style="--accent:#6F97C4" href="https://verify.skilljar.com/c/79vqscxi2prn" target="_blank" rel="noopener noreferrer">View verification →</a>
     </div><div class="cert shown" style="--accent: #9CBBAE;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove Introduction to Subagents">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">Introduction to Subagents</div>
       <div class="meta-grid">
@@ -259,7 +210,6 @@
       </div>
       <a class="cert-link" style="--accent:#9CBBAE" href="https://verify.skilljar.com/c/yy9fbkggn33m" target="_blank" rel="noopener noreferrer">View verification →</a>
     </div><div class="cert shown" style="--accent: #B3B2CE;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove Model Context Protocol: Advanced Topics">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">Model Context Protocol: Advanced Topics</div>
       <div class="meta-grid">
@@ -269,7 +219,6 @@
       </div>
       <a class="cert-link" style="--accent:#B3B2CE" href="https://verify.skilljar.com/c/zg9rjgra6nrm" target="_blank" rel="noopener noreferrer">View verification →</a>
     </div><div class="cert shown" style="--accent: #83925F;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove AI Fluency: Framework &amp; Foundations">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">AI Fluency: Framework &amp; Foundations</div>
       <div class="meta-grid">
@@ -279,7 +228,6 @@
       </div>
       <a class="cert-link" style="--accent:#83925F" href="https://verify.skilljar.com/c/ekg4iprkokye" target="_blank" rel="noopener noreferrer">View verification →</a>
     </div><div class="cert shown" style="--accent: #6A8FBF;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove Claude with the Anthropic API">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">Claude with the Anthropic API</div>
       <div class="meta-grid">
@@ -289,7 +237,6 @@
       </div>
       <a class="cert-link" style="--accent:#6A8FBF" href="https://verify.skilljar.com/c/eqojmqzqzfuz" target="_blank" rel="noopener noreferrer">View verification →</a>
     </div><div class="cert shown" style="--accent: #5eead4;">
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove AI Fluency for Small Business">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">AI Fluency for Small Business</div>
       <div class="meta-grid">
@@ -303,40 +250,8 @@
       <div class="line shown" id="doneLine"><span class="muted">Done.</span><span class="cursor" id="cursor"></span></div>
 
       <div class="actions" id="actions" style="opacity: 1; transition: opacity 0.4s;">
-        <button class="btn primary" id="saveFileBtn" type="button">Save credentials file</button>
         <button class="btn" id="printBtn" type="button">Print / Save as PDF</button>
-        <span class="status" id="saveStatus"></span>
       </div>
-
-      <details class="add-panel" open="">
-        <summary>Add a credential</summary>
-        <form class="add-form" id="addForm">
-          <div class="field">
-            <label for="f-course">Course name</label>
-            <input type="text" id="f-course" required="" placeholder="e.g. Claude with the Anthropic API">
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="f-id">Verification ID <span style="opacity:.6">(optional)</span></label>
-              <input type="text" id="f-id" placeholder="e.g. vz9mhax7e7vz">
-            </div>
-            <div class="field">
-              <label for="f-url">Verification URL <span style="opacity:.6">(optional)</span></label>
-              <input type="url" id="f-url" placeholder="https://verify.skilljar.com/c/…">
-            </div>
-          </div>
-          <div class="field">
-            <label for="f-accent">Accent color</label>
-            <div class="accent-row">
-              <input type="color" id="f-accent" value="#5EEAD4">
-              <span class="status">shows as the card's top border + status color</span>
-            </div>
-          </div>
-          <div class="actions">
-            <button type="submit" class="btn primary">Add to list</button>
-          </div>
-        </form>
-      </details>
 
       <div class="footline">Issued to ryan.drachenberg@forthepeople.com · forthepeople.com</div>
     </div>
@@ -358,7 +273,9 @@ window.CERTS = [
   { course:"Claude with the Anthropic API", id:"eqojmqzqzfuz", accent:"#6A8FBF",
     url:"https://verify.skilljar.com/c/eqojmqzqzfuz" },
   { course:"AI Fluency for Small Business", id:"8c86njndiz4f", accent:"#5eead4",
-    url:"https://verify.skilljar.com/c/8c86njndiz4f" }
+    url:"https://verify.skilljar.com/c/8c86njndiz4f" },
+  { course:"AI Capabilities and Limitations", id:"gh4p6diktivq", accent:"#D9A05B",
+    url:"https://verify.skilljar.com/c/gh4p6diktivq" }
 ];
 </script>
 
@@ -372,7 +289,6 @@ window.CERTS = [
   const countBadge = document.getElementById('countBadge');
   const actions = document.getElementById('actions');
   const cursor = document.getElementById('cursor');
-  const saveStatus = document.getElementById('saveStatus');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function escapeHtml(s){
@@ -397,7 +313,6 @@ window.CERTS = [
       ? `<a class="cert-link" style="--accent:${c.accent}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer">View verification →</a>`
       : `<div class="cert-link" style="--accent:${c.accent}; opacity:.6; cursor:default;">Verification link pending</div>`;
     el.innerHTML = `
-      <button class="cert-remove" type="button" title="Remove" aria-label="Remove ${escapeHtml(c.course)}">×</button>
       <div class="cert-eyebrow">Certificate of Completion</div>
       <div class="cert-course">${escapeHtml(c.course)}</div>
       <div class="meta-grid">
@@ -407,13 +322,6 @@ window.CERTS = [
       </div>
       ${linkRow}
     `;
-    el.querySelector('.cert-remove').addEventListener('click', () => {
-      const idx = window.CERTS.indexOf(c);
-      if(idx > -1) window.CERTS.splice(idx, 1);
-      el.remove();
-      countBadge.textContent = window.CERTS.length;
-      syncDataScript();
-    });
     return el;
   }
 
@@ -458,89 +366,6 @@ window.CERTS = [
   renderAll(!reduce);
   if(reduce){ showInstant(); } else { playIntro(); }
 
-  // ---- Add credential form ----
-  document.getElementById('addForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const course = document.getElementById('f-course').value.trim();
-    if(!course) return;
-    const id = document.getElementById('f-id').value.trim() || null;
-    const url = document.getElementById('f-url').value.trim() || null;
-    const accent = document.getElementById('f-accent').value || '#5EEAD4';
-    const newCert = { course, id, accent, url };
-    window.CERTS.push(newCert);
-
-    const total = window.CERTS.length;
-    verifyLines.appendChild(buildVerifyLine(newCert, total-1, total));
-    verifyLines.querySelectorAll('.verify-line').forEach((el, i) => el.classList.add('shown'));
-    countLine.querySelector('span').textContent = `${total} credentials found. Verifying signatures…`;
-    countBadge.textContent = total;
-
-    const card = buildCertCard(newCert, false);
-    certsRoot.appendChild(card);
-    card.classList.add('shown');
-
-    e.target.reset();
-    document.getElementById('f-accent').value = '#5EEAD4';
-    syncDataScript();
-    saveStatus.textContent = 'Added — remember to save the file.';
-    saveStatus.classList.remove('ok');
-  });
-
-  // ---- Keep the embedded <script id="certsData"> in sync with window.CERTS ----
-  function syncDataScript(){
-    const dataScript = document.getElementById('certsData');
-    const lines = window.CERTS.map(c => {
-      const id = c.id ? `"${c.id.replace(/"/g,'\\"')}"` : 'null';
-      const url = c.url ? `"${c.url.replace(/"/g,'\\"')}"` : 'null';
-      const course = c.course.replace(/"/g,'\\"');
-      return `  { course:"${course}", id:${id}, accent:"${c.accent}",\n    url:${url} }`;
-    });
-    dataScript.textContent = `\nwindow.CERTS = [\n${lines.join(',\n')}\n];\n`;
-  }
-
-  // ---- Save the whole page back to a file ----
-  let fileHandle = null;
-  async function saveToFile(){
-    const clone = document.documentElement.cloneNode(true);
-    clone.querySelector('#saveStatus').textContent = '';
-    const htmlStr = '<!DOCTYPE html>\n' + clone.outerHTML;
-
-    if('showSaveFilePicker' in window){
-      try{
-        if(!fileHandle){
-          fileHandle = await window.showSaveFilePicker({
-            suggestedName: 'certificate.html',
-            types: [{ description: 'HTML file', accept: { 'text/html': ['.html'] } }]
-          });
-        }
-        const writable = await fileHandle.createWritable();
-        await writable.write(htmlStr);
-        await writable.close();
-        saveStatus.textContent = 'Saved to file ✓';
-        saveStatus.classList.add('ok');
-      }catch(err){
-        if(err.name !== 'AbortError'){
-          fallbackDownload(htmlStr);
-        }
-      }
-    } else {
-      fallbackDownload(htmlStr);
-    }
-  }
-  function fallbackDownload(htmlStr){
-    const blob = new Blob([htmlStr], { type: 'text/html' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'certificate.html';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-    saveStatus.textContent = 'Downloaded — replace your old file with this one.';
-    saveStatus.classList.add('ok');
-  }
-
-  document.getElementById('saveFileBtn').addEventListener('click', saveToFile);
   document.getElementById('printBtn').addEventListener('click', ()=> window.print());
 })();
 </script>
